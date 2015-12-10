@@ -115,10 +115,10 @@ function init() {
     // var results = sys.drawSystem(7, 3, new THREE.Vector3( 0,-400,0 ), 90);
 
     // Tree5
-    // var sys = LSystem('X', 25.7);
-    // sys.addRule('X', 'F[+X][-X]FX');
-    // sys.addRule('F', 'FF');
-    // var results = sys.drawSystem(7, 3, new THREE.Vector3( 0,-400,0 ), 90);
+    var sys = LSystem('X', 25.7);
+    sys.addRule('X', 'F[+X][-X]FX');
+    sys.addRule('F', 'FF');
+    var results = sys.drawSystem(7, 3, new THREE.Vector3( 0,-400,0 ), 90);
 
     // Tree6
     // var sys = LSystem('X', 22.5);
@@ -144,13 +144,13 @@ function init() {
     // Tree1 
     // var sys = LSystem('F', 25.7);
     // sys.addRule('F', 'F[+F]F[-F]F');
-    // var shapes = sys.drawSystemCylinder(4, 5, new THREE.Vector3( 0,-200,0 ), 90, 1.0, 1.8);
+    // var shapes = sys.drawSystemCylinder(4, 5, new THREE.Vector3( 0,-200,0 ), 90, 1.0, 1.8, true);
 
 
     // // Tree2
     // var sys = LSystem('F', 20);
     // sys.addRule('F', 'F[+F]F[-F][F]');
-    // var shapes = sys.drawSystemCylinder(5, 10, new THREE.Vector3( 0,-400,0 ), 90, 1.5, 1.8);
+    // var shapes = sys.drawSystemCylinder(5, 10, new THREE.Vector3( 0,-400,0 ), 90, 1.5, 1.8, true);
 
     // Tree3
     // var sys = LSystem('F', 22.5);
@@ -161,19 +161,19 @@ function init() {
     // var sys = LSystem('X', 20);
     // sys.addRule('X', 'F[+X]F[-X]+X');
     // sys.addRule('F', 'FF');
-    // var shapes = sys.drawSystemCylinder(7, 1.5, new THREE.Vector3( 0,-200,0 ), 90, 1.5, 1.8);
+    // var shapes = sys.drawSystemCylinder(7, 1.5, new THREE.Vector3( 0,-200,0 ), 90, 1.5, 1.8, true);
 
     // Tree5
     // var sys = LSystem('X', 25.7);
     // sys.addRule('X', 'F[+X][-X]FX');
     // sys.addRule('F', 'FF');
-    // var shapes = sys.drawSystemCylinder(7, 1.5, new THREE.Vector3( 0,-200,0 ), 90, 1.5, 1.8);
+    // var shapes = sys.drawSystemCylinder(7, 1.5, new THREE.Vector3( 0,-200,0 ), 90, 1.5, 1.8, true);
 
     // Tree6
     // var sys = LSystem('X', 22.5);
     // sys.addRule('X', 'F-[[X]+X]+F[+FX]-X');
     // sys.addRule('F', 'FF');
-    // var shapes = sys.drawSystemCylinder(6, 2.5, new THREE.Vector3( 0,-200,0 ), 90, 5, 2);
+    // var shapes = sys.drawSystemCylinder(6, 2.5, new THREE.Vector3( 0,-200,0 ), 90, 5, 2, true);
 
     // Stochastic Tree Line
     // var sys = LSystem('F', 22.5);
@@ -181,40 +181,49 @@ function init() {
     // var results = sys.drawSystem(6,10, new THREE.Vector3( 0,-400,0 ), 90, true);
 
     // Stochastic Tree Cylinder
-    var sys = LSystem('F', 22.5);
-    sys.addRule('F', ['F[+F]F[-F]F', 'F[+F]F', 'F[-F]F']);
-    var shapes = sys.drawSystemCylinder(6,2.5, new THREE.Vector3( 0,-200,0 ), 90,1.5, 1.4, true);
-    //
+    // var sys = LSystem('F', 22.5);
+    // sys.addRule('F', ['F[+F]F[-F]F', 'F[+F]F', 'F[-F]F']);
+    // var shapes = sys.drawSystemCylinder(6,2.5, new THREE.Vector3( 0,-200,0 ), 90,1.5, 1.4, true);
+    // //
 
-    var sys2 = LSystem('F', 22.5);
-    sys2.addRule('F', ['F[+F]F[-F]F', 'F[+F]F', 'F[-F]F']);
-    var shapes2 = sys2.drawSystemCylinder(6,2.5, new THREE.Vector3( -100,-200, -100 ), 90,1.5, 1.4, true);
+    // var sys2 = LSystem('F', 22.5);
+    // sys2.addRule('F', ['F[+F]F[-F]F', 'F[+F]F', 'F[-F]F']);
+    // var shapes2 = sys2.drawSystemCylinder(6,2.5, new THREE.Vector3( -100,-200, -100 ), 90,1.5, 1.4, true);
 
+    // Another Stochastic Tree Cylinder
+    // var sys = LSystem('F', 22.5);
+    // sys.addRule('F', ['F[+F][-F]F', 'F[-F]F', 'F[+F]F']);
+    // var shapes = sys.drawSystemCylinder(7,3, new THREE.Vector3( 0,-150,0 ), 90,1.5, 1.4, true);
+
+    // Stochastic Bush
+    // var sys = LSystem('FB', 10);
+    // sys.addRule('B', ['[+FB][-FB]', '[++FB][--FB]', '[+++FB][---FB]']);
+    // var shapes = sys.drawSystemCylinder(10,10, new THREE.Vector3( 0,-150,0 ), 90,3, 1.15, true);
 
     //colors3[ i ].setHSL( i / points.length, 1.0, 0.5 );
 
-    // geometry3.colors = results[1];
-    // geometry3.vertices = results[0];
+    geometry3.colors = results[1];
+    geometry3.vertices = results[0];
 
-    // material = new THREE.LineBasicMaterial( { color: 0xffffff, opacity: 1, linewidth: 1, vertexColors: THREE.VertexColors } );
+    material = new THREE.LineBasicMaterial( { color: 0xffffff, opacity: 1, linewidth: 1, vertexColors: THREE.VertexColors } );
 
-    // var line, p, scale = 0.3, d = 225;
+    var line, p, scale = 0.3, d = 225;
 
-    // line = new THREE.Line(geometry3, material );
-    // line.scale.x = line.scale.y = line.scale.z =  scale*1.5;
-    // line.position.x = 0;
-    // line.position.y = 0;
-    // line.position.z = 0;
-    // scene.add( line );
+    line = new THREE.Line(geometry3, material );
+    line.scale.x = line.scale.y = line.scale.z =  scale*1.5;
+    line.position.x = 0;
+    line.position.y = 0;
+    line.position.z = 0;
+    scene.add( line );
 
 
-    for (var i = 0; i<shapes.length; i++) {
-        scene.add(shapes[i]);
-    }
+    // for (var i = 0; i<shapes.length; i++) {
+    //     scene.add(shapes[i]);
+    // }
 
-    for (var i =0; i<shapes2.length; i++) {
-        scene.add(shapes2[i]);
-    }
+    // for (var i =0; i<shapes2.length; i++) {
+    //     scene.add(shapes2[i]);
+    // }
 
     window.addEventListener( 'resize', onWindowResize, false );
 

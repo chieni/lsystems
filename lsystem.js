@@ -15,24 +15,6 @@ var LSystem = function(axiom, theta) {
       for (var j=0; j < current.length; j++) {
         var next = current.charAt(j);
         if (rules[next]) {
-          temp += rules[next];
-        } else {
-          temp += next;
-        }
-      }
-      current = String(temp);
-    }
-    return current;
-  }
-
-  that.getCurrentStochasticSystem = function(iterations) {
-    var current = axiom;
-    for (var i=0; i < iterations; i++) {
-      var temp = "";
-
-      for (var j=0; j < current.length; j++) {
-        var next = current.charAt(j);
-        if (rules[next]) {
           if (typeof rules[next] == 'object') {
             var r = Math.floor(Math.random() * rules[next].length);
             temp += rules[next][r];
@@ -46,7 +28,6 @@ var LSystem = function(axiom, theta) {
       }
       current = String(temp);
     }
-    console.log(current);
     return current;
   }
 
@@ -77,18 +58,14 @@ var LSystem = function(axiom, theta) {
     return max;
   }
 
-  that.drawSystem = function(iterations, length, start, angle, stochastic) {
-    var current;
-    if (stochastic) {
-      current = that.getCurrentStochasticSystem(iterations);
-    } else {
-      current = that.getCurrentSystem(iterations);
-    }
+  that.drawSystem = function(iterations, length, start, angle) {
+    var current = that.getCurrentSystem(iterations);
 
     var completeDepth = that.getDepth(current);
 
     var depth = 0;
     var results = [];
+    var leafColors = [0x009900, 0x00b300, 0x008000 ];
     var colors = [];
 
     var angle = angle*Math.PI / 180;
@@ -108,6 +85,8 @@ var LSystem = function(axiom, theta) {
     var begin = new THREE.Vector3(start.x,start.y,start.z);
     var end = new THREE.Vector3();
 
+    var color = 0x291400;
+
 
     for (var i = 0; i<current.length; i++) {
       var character = current.charAt(i);
@@ -126,8 +105,8 @@ var LSystem = function(axiom, theta) {
           vertices.push(begin.clone());
           vertices.push(end.clone());
 
-          colors.push(new THREE.Color(0x291400));
-          colors.push(new THREE.Color(0x291400));
+          colors.push(new THREE.Color(color));
+          colors.push(new THREE.Color(color));
 
           begin.copy(end);
 
@@ -146,42 +125,25 @@ var LSystem = function(axiom, theta) {
 
         case '[':
           depth += 1;
+          if (depth > completeDepth/4) {
+            var r = Math.floor(Math.random()*leafColors.length)
+            color = Number(leafColors[r]);
+          }
           vStack.push(new THREE.Vector3(begin.x, begin.y, begin.z));
           dirStack.push(new THREE.Vector3(directionVector.x, directionVector.y, directionVector.z));
           break;
 
         case ']':
           depth -= 1;
+          if (depth < completeDepth/4) {
+            color = 0x291400;
+          }
+
           var temp = vStack.pop();
           begin.copy(new THREE.Vector3(temp.x, temp.y, temp.z));
           directionVector = dirStack.pop();
           break;
 
-        case '\\':
-          xRotation.makeRotationX(dtheta);
-          directionVector = directionVector.clone().transformDirection(xRotation);
-
-          break;
-
-        case '/':
-          xRotation.makeRotationX(-dtheta);
-          directionVector = directionVector.clone().transformDirection(xRotation);
-          break;
-
-        case '^':
-          yRotation.makeRotationY(-dtheta);
-          directionVector = directionVector.clone().transformDirection(yRotation);
-          break;
-
-        case '&':
-          yRotation.makeRotationY(dtheta);
-          directionVector = directionVector.clone().transformDirection(yRotation);
-          break;
-
-        case '|':
-          zRotation.makeRotationZ(Math.PI);
-          directionVector = directionVector.clone().transformDirection(zRotation);
-          break;
         default:
           break;
       }
@@ -193,14 +155,9 @@ var LSystem = function(axiom, theta) {
   }
 
 
-  that.drawSystemCylinder = function(iterations, length, start, angle, radius, shrinkFactor, stochastic) {
-    var current;
-    if (stochastic) {
-      current = that.getCurrentStochasticSystem(iterations);
-    } else {
-      current = that.getCurrentSystem(iterations);
-    }
-
+  that.drawSystemCylinder = function(iterations, length, start, angle, radius, shrinkFactor, random) {
+    var current = that.getCurrentSystem(iterations);
+  
     var completeDepth = that.getDepth(current);
 
     var depth = 0;
@@ -210,7 +167,7 @@ var LSystem = function(axiom, theta) {
 
     var shapes = [];
 
-    var colors = [ 0x1A801A ];
+    var colors = [0x006600, 0x004d00, 0x003300 ];
     var vStack = [];
     var dirStack = [];
     var aStack = [];
@@ -238,8 +195,7 @@ var LSystem = function(axiom, theta) {
         case 'F':
         case 'G':
         case 'f':
-          
-          zRotation.makeRotationZ(angle);
+        case 'B':
 
           var a = directionVector.clone().setLength(length);
           end.addVectors(begin, a);  
@@ -267,22 +223,45 @@ var LSystem = function(axiom, theta) {
         case '-':
           angle -= dtheta;
           zRotation.makeRotationZ(-dtheta);
-          //yRotation.makeRotationY(-dtheta);
-          directionVector = directionVector.clone().transformDirection(zRotation).transformDirection(yRotation);
+          if (random) {
+            var xRand = Math.random()*dtheta;
+            xRand *= Math.floor(Math.random()*2) == 1 ? 1 : -1;
+
+            var yRand = Math.random()*Math.PI/2;
+            yRand *= Math.floor(Math.random()*2) == 1 ? 1 : -1;
+
+            xRotation.makeRotationX(xRand);
+            yRotation.makeRotationY(yRand);
+            directionVector = directionVector.clone().transformDirection(zRotation).transformDirection(yRotation).transformDirection(xRotation);
+          } else {
+            directionVector = directionVector.clone().transformDirection(zRotation);
+          }
           break;
 
         case '+':
           angle += dtheta;
           zRotation.makeRotationZ(dtheta);
-          //xRotation.makeRotationX(dtheta);
-          directionVector = directionVector.clone().transformDirection(zRotation).transformDirection(xRotation);
+          if (random) {
+            var xRand = Math.random()*dtheta;
+            xRand *= Math.floor(Math.random()*2) == 1 ? 1 : -1;
+
+            var yRand = Math.random()*Math.PI/2;
+            yRand *= Math.floor(Math.random()*2) == 1 ? 1 : -1;
+
+            xRotation.makeRotationX(xRand);
+            yRotation.makeRotationY(yRand);
+            directionVector = directionVector.clone().transformDirection(zRotation).transformDirection(yRotation).transformDirection(xRotation);
+          } else {
+            directionVector = directionVector.clone().transformDirection(zRotation)
+          }
           break;
 
         case '[':
           depth += 1;
     
           if (depth > completeDepth/4) {
-            color = 0x004d00;
+            var r = Math.floor(Math.random()*colors.length)
+            color = Number(colors[r]);
           }
 
           cylRadius /= shrinkFactor;
@@ -305,31 +284,6 @@ var LSystem = function(axiom, theta) {
           directionVector = dirStack.pop();
           break;
 
-        case '\\':
-          xRotation.makeRotationX(dtheta);
-          directionVector = directionVector.clone().transformDirection(xRotation);
-
-          break;
-
-        case '/':
-          xRotation.makeRotationX(-dtheta);
-          directionVector = directionVector.clone().transformDirection(xRotation);
-          break;
-
-        case '^':
-          yRotation.makeRotationY(-dtheta);
-          directionVector = directionVector.clone().transformDirection(yRotation);
-          break;
-
-        case '&':
-          yRotation.makeRotationY(dtheta);
-          directionVector = directionVector.clone().transformDirection(yRotation);
-          break;
-
-        case '|':
-          zRotation.makeRotationZ(Math.PI);
-          directionVector = directionVector.clone().transformDirection(zRotation);
-          break;
         default:
           break;
       }
