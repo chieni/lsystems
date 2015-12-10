@@ -2,7 +2,6 @@
 var LSystem = function(axiom, theta) {
   var that = Object.create(LSystem.prototype);
   var rules = {};
-  var shrinkFactor = 1.8;
 
   that.addRule = function(character, rule) {
     rules[character] = rule;
@@ -26,20 +25,79 @@ var LSystem = function(axiom, theta) {
     return current;
   }
 
-  that.drawSystem = function(iterations, length, start, angle) {
-    var current = that.getCurrentSystem(iterations);
+  that.getCurrentStochasticSystem = function(iterations) {
+    var current = axiom;
+    for (var i=0; i < iterations; i++) {
+      var temp = "";
+
+      for (var j=0; j < current.length; j++) {
+        var next = current.charAt(j);
+        if (rules[next]) {
+          if (typeof rules[next] == 'object') {
+            var r = Math.floor(Math.random() * rules[next].length);
+            temp += rules[next][r];
+          } else {
+            temp += rules[next];
+          }
+          
+        } else {
+          temp += next;
+        }
+      }
+      current = String(temp);
+    }
+    console.log(current);
+    return current;
+  }
+
+  that.getDepth = function(system) {
+   var current_max = 0; // current count
+    var max = 0;    // overall maximum count
+ 
+    // Traverse the input string
+    for (var i = 0; i< system.length; i++)
+    {
+        if (system.charAt(i) === '[') {
+            current_max+=1;
+ 
+            // update max if required
+            if (current_max> max){
+
+                max = Number(current_max);
+
+              }
+        }
+        else if (system.charAt(i) === ']'){
+            if (current_max>0) {
+                current_max-=1;
+            }
+        }
+    }
+ 
+    return max;
+  }
+
+  that.drawSystem = function(iterations, length, start, angle, stochastic) {
+    var current;
+    if (stochastic) {
+      current = that.getCurrentStochasticSystem(iterations);
+    } else {
+      current = that.getCurrentSystem(iterations);
+    }
+
+    var completeDepth = that.getDepth(current);
+
+    var depth = 0;
     var results = [];
     var colors = [];
 
     var angle = angle*Math.PI / 180;
     var dtheta = theta*Math.PI / 180;
     var vertices = [];
-    var shapes = [];
 
 
     var vStack = [];
     var dirStack = [];
-    var aStack = [];
 
     var original = new THREE.Vector3(length, 0, 0);
     var directionVector = new THREE.Vector3(1,0,0);
@@ -50,7 +108,6 @@ var LSystem = function(axiom, theta) {
     var begin = new THREE.Vector3(start.x,start.y,start.z);
     var end = new THREE.Vector3();
 
-    var cylRadius = 1.5;
 
     for (var i = 0; i<current.length; i++) {
       var character = current.charAt(i);
@@ -62,8 +119,6 @@ var LSystem = function(axiom, theta) {
         case 'F':
         case 'G':
         case 'f':
-          
-          zRotation.makeRotationZ(angle);
 
           var a = directionVector.clone().setLength(length);
           end.addVectors(begin, a);  
@@ -71,24 +126,8 @@ var LSystem = function(axiom, theta) {
           vertices.push(begin.clone());
           vertices.push(end.clone());
 
-          colors.push(new THREE.Color(0xffffff));
-          colors.push(new THREE.Color(0xffffff));
-
-
-          // Cylinder construction
-          var material = new THREE.MeshBasicMaterial( {color: 0xffffff} );
-          var cylinder = new THREE.CylinderGeometry(cylRadius,cylRadius,length);
-
-          cylinder.applyMatrix(new THREE.Matrix4().makeTranslation(0, length/2, 0));
-          cylinder.applyMatrix(new THREE.Matrix4().makeRotationX(THREE.Math.degToRad(90)));
-
-          var mesh = new THREE.Mesh(cylinder,material);
-          mesh.position.copy(begin);
-          mesh.lookAt(end);
-          shapes.push(mesh);
-
-
-
+          colors.push(new THREE.Color(0x291400));
+          colors.push(new THREE.Color(0x291400));
 
           begin.copy(end);
 
@@ -96,27 +135,23 @@ var LSystem = function(axiom, theta) {
           break;
 
         case '-':
-          angle -= dtheta;
           zRotation.makeRotationZ(-dtheta);
           directionVector = directionVector.clone().transformDirection(zRotation);
           break;
 
         case '+':
-          angle += dtheta;
           zRotation.makeRotationZ(dtheta);
           directionVector = directionVector.clone().transformDirection(zRotation);
           break;
 
         case '[':
-          cylRadius /= shrinkFactor;
-          aStack.push(angle);
+          depth += 1;
           vStack.push(new THREE.Vector3(begin.x, begin.y, begin.z));
           dirStack.push(new THREE.Vector3(directionVector.x, directionVector.y, directionVector.z));
           break;
 
         case ']':
-          cylRadius *= shrinkFactor;
-          angle = aStack.pop();
+          depth -= 1;
           var temp = vStack.pop();
           begin.copy(new THREE.Vector3(temp.x, temp.y, temp.z));
           directionVector = dirStack.pop();
@@ -154,8 +189,154 @@ var LSystem = function(axiom, theta) {
     }
     results.push(vertices);
     results.push(colors);
-    results.push(shapes);
     return results;
+  }
+
+
+  that.drawSystemCylinder = function(iterations, length, start, angle, radius, shrinkFactor, stochastic) {
+    var current;
+    if (stochastic) {
+      current = that.getCurrentStochasticSystem(iterations);
+    } else {
+      current = that.getCurrentSystem(iterations);
+    }
+
+    var completeDepth = that.getDepth(current);
+
+    var depth = 0;
+
+    var angle = angle*Math.PI / 180;
+    var dtheta = theta*Math.PI / 180;
+
+    var shapes = [];
+
+    var colors = [ 0x1A801A ];
+    var vStack = [];
+    var dirStack = [];
+    var aStack = [];
+
+    var original = new THREE.Vector3(length, 0, 0);
+    var directionVector = new THREE.Vector3(1,0,0);
+    var initRotation = new THREE.Matrix4();
+    initRotation.makeRotationZ(angle);
+    directionVector.transformDirection(initRotation);
+
+    var begin = new THREE.Vector3(start.x,start.y,start.z);
+    var end = new THREE.Vector3();
+
+    var cylRadius = Number(radius);
+
+    var color = 0x291400;
+
+    for (var i = 0; i<current.length; i++) {
+      var character = current.charAt(i);
+      var yRotation = new THREE.Matrix4();
+      var xRotation = new THREE.Matrix4();
+      var zRotation = new THREE.Matrix4();
+
+      switch (character) {
+        case 'F':
+        case 'G':
+        case 'f':
+          
+          zRotation.makeRotationZ(angle);
+
+          var a = directionVector.clone().setLength(length);
+          end.addVectors(begin, a);  
+
+          // Cylinder construction
+          var material = new THREE.MeshLambertMaterial( {color: color, emissive: color} );
+          material.wireframeLinewidth = 5;
+          var cylinder = new THREE.CylinderGeometry(cylRadius/5,cylRadius,length + 3*cylRadius);
+          cylinder.colors.push(color);
+
+          cylinder.applyMatrix(new THREE.Matrix4().makeTranslation(0, length/2 + 2*cylRadius, 0));
+          cylinder.applyMatrix(new THREE.Matrix4().makeRotationX(THREE.Math.degToRad(90)));
+
+          var mesh = new THREE.Mesh(cylinder,material);
+          mesh.castShadow = true;
+          mesh.receiveShadow = true;
+          mesh.position.copy(begin);
+          mesh.lookAt(end);
+          shapes.push(mesh);
+
+          begin.copy(end);
+
+          break;
+
+        case '-':
+          angle -= dtheta;
+          zRotation.makeRotationZ(-dtheta);
+          //yRotation.makeRotationY(-dtheta);
+          directionVector = directionVector.clone().transformDirection(zRotation).transformDirection(yRotation);
+          break;
+
+        case '+':
+          angle += dtheta;
+          zRotation.makeRotationZ(dtheta);
+          //xRotation.makeRotationX(dtheta);
+          directionVector = directionVector.clone().transformDirection(zRotation).transformDirection(xRotation);
+          break;
+
+        case '[':
+          depth += 1;
+    
+          if (depth > completeDepth/4) {
+            color = 0x004d00;
+          }
+
+          cylRadius /= shrinkFactor;
+          aStack.push(angle);
+          vStack.push(new THREE.Vector3(begin.x, begin.y, begin.z));
+          dirStack.push(new THREE.Vector3(directionVector.x, directionVector.y, directionVector.z));
+          break;
+
+        case ']':
+          depth -= 1;
+
+          if (depth < completeDepth/4) {
+            color = 0x291400;
+          }
+
+          cylRadius *= shrinkFactor;
+          angle = aStack.pop();
+          var temp = vStack.pop();
+          begin.copy(new THREE.Vector3(temp.x, temp.y, temp.z));
+          directionVector = dirStack.pop();
+          break;
+
+        case '\\':
+          xRotation.makeRotationX(dtheta);
+          directionVector = directionVector.clone().transformDirection(xRotation);
+
+          break;
+
+        case '/':
+          xRotation.makeRotationX(-dtheta);
+          directionVector = directionVector.clone().transformDirection(xRotation);
+          break;
+
+        case '^':
+          yRotation.makeRotationY(-dtheta);
+          directionVector = directionVector.clone().transformDirection(yRotation);
+          break;
+
+        case '&':
+          yRotation.makeRotationY(dtheta);
+          directionVector = directionVector.clone().transformDirection(yRotation);
+          break;
+
+        case '|':
+          zRotation.makeRotationZ(Math.PI);
+          directionVector = directionVector.clone().transformDirection(zRotation);
+          break;
+        default:
+          break;
+      }
+
+    }
+    
+    return shapes;
   }
 
   that.hilbert3D = function( center, size, iterations, v0, v1, v2, v3, v4, v5, v6, v7 ) {
