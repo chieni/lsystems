@@ -161,6 +161,12 @@ $('.selector').click(function(){
             } else {
                 alert('Bush can only be 3D');
             }
+        case 'forest':
+            if (selectedVal === 'yes') {
+                createForest();
+            } else {
+                alert('Forest can only be 3D');
+            }
     }
     
 })
