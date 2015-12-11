@@ -26,7 +26,7 @@ var Tree = function() {
     if (!threed){
         var results = sys.drawSystem(5, 15, new THREE.Vector3( 0,-400,0 ), 90);
     } else {
-        var results = sys.drawSystemCylinder(5, 10, new THREE.Vector3( 0,-400,0 ), 90, 1.5, 1.8, true);
+        var results = sys.drawSystemCylinder(5, 10, new THREE.Vector3( 0,-400,0 ), 90, 2.5, 1.8, true);
 
     }
     return results;
@@ -41,7 +41,7 @@ var Tree = function() {
     if (!threed){
         var results = sys.drawSystem(4, 13, new THREE.Vector3( 0,-400,0 ), 90);
     } else {
-        var results = sys.drawSystemCylinder(5, 10, new THREE.Vector3( 0,-400,0 ), 90, 1.5, 1.8, true);
+        var results = sys.drawSystemCylinder(3, 10, new THREE.Vector3( 0,-200,0 ), 90, 1.5, 1.8, true);
 
     }
     return results;
@@ -73,7 +73,7 @@ var Tree = function() {
     if (!threed){
         var results = sys.drawSystem(7, 3, new THREE.Vector3( 0,-400,0 ), 90);
     } else {
-        var results = sys.drawSystemCylinder(7, 1.5, new THREE.Vector3( 0,-200,0 ), 90, 1.5, 1.8, true);
+        var results = sys.drawSystemCylinder(2, 1.5, new THREE.Vector3( 0,-200,0 ), 90, 1.5, 1.8, true);
     }
     return results;
   }
@@ -106,10 +106,10 @@ var Tree = function() {
     return results;
   }
 
-  that.stree2 = function() {
+  that.stree2 = function(center) {
     var sys = LSystem('F', 22.5);
     sys.addRule('F', ['F[+F][-F]F', 'F[-F]F', 'F[+F]F']);
-    var results = sys.drawSystemCylinder(7,3, new THREE.Vector3( 0,-150,0 ), 90,1.5, 1.4, true);
+    var results = sys.drawSystemCylinder(7,3, center, 90,1.5, 1.4, true);
     return results; 
   }
     

@@ -1,9 +1,12 @@
 if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
 
 var windowHalfX = window.innerWidth / 2,
-windowHalfY = window.innerHeight / 2,
+windowHalfY = window.innerHeight / 2;
 
-camera, scene, renderer, material, controls;
+var fractal = Fractal();
+var tree = Tree();
+
+var camera, scene, renderer, material, controls;
 
 init();
 animate();
@@ -11,10 +14,10 @@ animate();
 function init() {
 
     var i, container;
-
+    var doc = document.getElementById('doc');
     container = document.createElement( 'div' );
     container.className = 'bg';
-    document.body.appendChild( container );
+    doc.appendChild( container );
 
     camera = new THREE.PerspectiveCamera( 33, window.innerWidth / window.innerHeight, 1, 10000 );
     camera.position.z = 700;
@@ -23,12 +26,25 @@ function init() {
 
     renderer = new THREE.WebGLRenderer();
     renderer.setClearColor( 0xe5f9ff );
+    //renderer.setClearColor( 0xffffff );
     renderer.setPixelRatio( window.devicePixelRatio );
-    renderer.setSize( window.innerWidth, window.innerHeight );
+    renderer.setSize( window.innerWidth/1.4, window.innerHeight/1.4);
 
     container.appendChild( renderer.domElement );
 
     // Lights
+    addLights();
+
+    controls = new THREE.OrbitControls( camera, renderer.domElement );
+
+    controls.target.set( 0, 2, 0 );
+    controls.update();
+
+    window.addEventListener( 'resize', onWindowResize, false );
+
+}
+
+function addLights() {
     var ambientLight = new THREE.AmbientLight( 0x000000 );
     scene.add( ambientLight );
 
@@ -45,24 +61,113 @@ function init() {
     scene.add( lights[0] );
     scene.add( lights[1] );
 
-    controls = new THREE.OrbitControls( camera, renderer.domElement );
-
-    controls.target.set( 0, 2, 0 );
-    controls.update();
-
-
-    var fractal = Fractal();
-    var tree = Tree();
-
-    addLinesToScene(tree.tree1(false));
-
-    window.addEventListener( 'resize', onWindowResize, false );
-
 }
+
+$('.selector').click(function(){
+    var id = this.id;
+    var i = $('#iterations').val();
+    var selectedObj = scene.getObjectByName("current");
+    var obj, j;
+    for ( j= scene.children.length - 1; j >= 0 ; j -- ) {
+        obj = scene.children[ j ];
+        scene.remove(obj);
+    }
+    addLights();
+
+    var selectedVal = "";
+    var selected = $("input[type='radio'][name='dim']:checked");
+    if (selected.length >0){
+        selectedVal = selected.val();
+    }
+
+    switch(id) {
+        case 'koch':
+            if (i == 0) {
+                alert('Please fill out the number of iterations.')
+            }
+            addLinesToScene(fractal.koch(i), true);
+            break;
+        case 'triangle':
+            if (i == 0) {
+                alert('Please fill out the number of iterations.')
+            }
+            addLinesToScene(fractal.triangle(i), true);
+            break;
+        case 'hex':
+            if (i == 0) {
+                alert('Please fill out the number of iterations.')
+            }
+            addLinesToScene(fractal.hex(i), true);
+            break;
+        case 'dragon':
+            if (i == 0) {
+                alert('Please fill out the number of iterations.')
+            }
+            addLinesToScene(fractal.dragon(i), true);
+            break;
+        case 'tree1':
+            if (selectedVal === 'yes') {
+                addShapesToScene(tree.tree1(true));
+            } else {
+                addLinesToScene(tree.tree1());
+            }
+                
+            break;
+        case 'tree2':
+            if (selectedVal === 'yes') {
+                addShapesToScene(tree.tree2(true));
+            } else {
+                addLinesToScene(tree.tree2());
+            }
+            break;
+        case 'tree3':
+            if (selectedVal === 'yes') {
+                addShapesToScene(tree.tree3(true));
+            } else {
+                addLinesToScene(tree.tree3());
+            }
+            break;
+        case 'tree4':
+            if (selectedVal === 'yes') {
+                addShapesToScene(tree.tree4(true));
+            } else {
+                addLinesToScene(tree.tree4());
+            }
+            break;
+        case 'tree5':
+            if (selectedVal === 'yes') {
+                addShapesToScene(tree.tree5(true));
+            } else {
+                addLinesToScene(tree.tree5());
+            }
+            break;
+        case 'tree6':
+            if (selectedVal === 'yes') {
+                addShapesToScene(tree.tree6(true));
+            } else {
+                addLinesToScene(tree.tree6());
+            }
+            break;
+        case 'tree-rand':
+            if (selectedVal === 'yes') {
+                addShapesToScene(tree.stree(true));
+            } else {
+                addLinesToScene(tree.stree());
+            }
+            break;
+        case 'bush':
+            if (selectedVal === 'yes') {
+                addShapesToScene(tree.bush(true));
+            } else {
+                alert('Bush can only be 3D');
+            }
+    }
+    
+})
 
 function makeRainbow(colors3) {
     for (var i = 0; i<colors3.length; i++) {
-        colors3[ i ].setHSL( i / points.length, 1.0, 0.5 );
+        colors3[ i ].setHSL( i / colors3.length, 1.0, 0.5 );
     }
     return colors3;
 }
@@ -86,6 +191,7 @@ function addLinesToScene(results, rainbow) {
     line.position.x = 0;
     line.position.y = 0;
     line.position.z = 0;
+    line.name = "current";
     scene.add( line );
 }
 

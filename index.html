@@ -1,31 +1,48 @@
-<!-- <script src="http://threejs.org/build/three.min.js"></script>
-
-<link rel="stylesheet" href="style.css" />
-<body>
-  <div id="gui"></div>
-  <canvas id='back' style="position: absolute; left: 0; top: 0; z-index: 0;"> </canvas>
-  <canvas id='canvas' style="position: absolute; left: 0; top: 0; z-index: 1;"> </canvas>   
-</body>
-<script src="index.js"></script> -->
-
-
 <!DOCTYPE html>
 <html lang="en">
 	<head>
 		<title>6.837 Final</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-		<style>
-			body {
-				background-color: #FFFFFF;
-				margin: 0px;
-				overflow: hidden;
-			}
-
-		</style>
+		<link rel="stylesheet" type="text/css" href="style.css" />
 	</head>
 	<body>
 
+		<h1> L-Systems</h1>
+
+		<div id="doc">
+		</div>
+		<div class="sidebar">
+			
+			<h2>Fractals</h2>
+			<span>Iterations: </span><input type="text" id="iterations"/>
+				<div class="selector" id="koch">Koch Island</div>
+				<div class="selector" id="triangle">Sierpinski Triangle</div>
+				<div class="selector" id="hex">Hexogonal Gosper</div>
+				<div class="selector" id="dragon">Dragon</div>
+
+
+			<h2>Plants</h2>
+			<span>Iterations Predetermined</span>
+			<form action="">
+				<input type="radio" name="dim" value="no">2D</input>
+				<input type="radio" name="dim" value="yes">3D</input>
+
+			</form>
+
+				<div class="selector" id="tree1">Tree 1</div>
+				<div class="selector" id="tree2">Tree 2</div>
+				<div class="selector" id="tree3">Tree 3</div>
+				<div class="selector" id="tree4">Tree 4</div>
+				<div class="selector" id="tree5">Tree 5</div>
+				<div class="selector" id="tree6">Tree 6</div>
+				<div class="selector" id="tree-rand">Randomized Tree</div>
+				<div class="selector" id="bush">Bush</div>
+		</div>
+
+
+
+		<script src="https://code.jquery.com/jquery-1.11.1.min.js"></script>
 		<script src="threejs/build/three.min.js"></script>
 
 		<script src="threejs/examples/js/renderers/Projector.js"></script>
@@ -37,13 +54,6 @@
 		<script src="fractals.js"></script>
 		<script src="trees.js"></script>
 		<script src="index.js"></script>
-	<!-- 	// <script src="reference.js"></script> -->
-
-		<script>
-
-
-
-		</script>
 	</body>
 </html>
 
