@@ -73,7 +73,7 @@ var Tree = function() {
     if (!threed){
         var results = sys.drawSystem(7, 3, new THREE.Vector3( 0,-400,0 ), 90);
     } else {
-        var results = sys.drawSystemCylinder(2, 1.5, new THREE.Vector3( 0,-200,0 ), 90, 1.5, 1.8, true);
+        var results = sys.drawSystemCylinder(7, 1.5, new THREE.Vector3( 0,-200,0 ), 90, 1.5, 1.8, true);
     }
     return results;
   }
